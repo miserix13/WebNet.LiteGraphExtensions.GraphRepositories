@@ -2,9 +2,52 @@
 
 Graph repository implementations for the LiteGraph library, providing persistent storage backends for graph data structures.
 
+## Quick Start
+
+```csharp
+// Option 1: DuckDB (SQL-based, best for analytics)
+var duckDb = new DuckDBGraphRepository("Data Source=mydb.duckdb");
+duckDb.InitializeRepository();
+
+// Option 2: FastDB (NoSQL, best for performance)
+var fastDb = new FastDBGraphRepository("./mydb.fastdb", 
+    new FastDBOptions { Serializer = SerializerType.MessagePack_Contract });
+fastDb.InitializeRepository();
+
+// Use either repository through the same LiteGraph interfaces
+var tenant = await repository.Tenant.Create(new TenantMetadata 
+{ 
+    GUID = Guid.NewGuid(),
+    Name = "My Tenant" 
+});
+```
+
 ## Overview
 
 This library provides concrete implementations of the LiteGraph `GraphRepositoryBase` abstract class, enabling you to store and query graph data using various database backends.
+
+## Comparison Table
+
+| Feature | DuckDBGraphRepository | FastDBGraphRepository | LiteDBGraphRepository |
+|---------|----------------------|----------------------|----------------------|
+| **Storage Type** | SQL (Columnar) | NoSQL (Key-Value Collections) | NoSQL (Document) |
+| **Best For** | Analytics, Complex Queries | Simple CRUD, High Performance | General Purpose |
+| **ACID Compliance** | ✅ Full | ⚠️ Limited | ✅ Full |
+| **Schema Required** | ✅ Yes | ❌ No | ❌ No |
+| **Backup Support** | ✅ Native | ⚠️ Manual | ⚠️ Pending |
+| **In-Memory Mode** | ✅ Yes | ❌ No | ✅ Yes |
+| **Serialization** | SQL | MessagePack/JSON/Binary | BSON |
+| **File Size** | Large | Small | Medium |
+| **Query Performance** | Excellent (SQL) | Very Fast (Direct Key Access) | Good (Indexed) |
+| **Setup Complexity** | Medium | Low | Low |
+
+## When to Use Each Implementation
+
+- **DuckDBGraphRepository**: Choose when you need complex analytical queries, reporting, or data warehousing capabilities. Best for read-heavy workloads with complex joins and aggregations.
+
+- **FastDBGraphRepository**: Choose when you need lightweight embedded storage with simple key-based access patterns. Best for write-heavy workloads, caching, or when storage size is a concern.
+
+- **LiteDBGraphRepository**: *(Coming soon)* General-purpose document storage with indexing and LINQ query support.
 
 ## Available Implementations
 
@@ -178,6 +221,51 @@ Note: Most CRUD operations currently throw `NotImplementedException` and require
 
 *(Documentation pending)*
 
+## Architecture
+
+All repository implementations follow a common pattern:
+
+```
+GraphRepositoryBase (abstract)
+├── DuckDBGraphRepository
+│   ├── AdminMethods (IAdminMethods)
+│   ├── TenantMethods (ITenantMethods)
+│   ├── UserMethods (IUserMethods)
+│   ├── CredentialMethods (ICredentialMethods)
+│   ├── LabelMethods (ILabelMethods)
+│   ├── TagMethods (ITagMethods)
+│   ├── VectorMethods (IVectorMethods)
+│   ├── GraphMethods (IGraphMethods)
+│   ├── NodeMethods (INodeMethods)
+│   ├── EdgeMethods (IEdgeMethods)
+│   ├── BatchMethods (IBatchMethods)
+│   └── VectorIndexMethods (IVectorIndexMethods)
+│
+├── FastDBGraphRepository
+│   └── (same interface structure)
+│
+└── LiteDBGraphRepository
+    └── (same interface structure)
+```
+
+Each implementation provides the same 12 interface implementations, ensuring consistent API across all storage backends.
+
+## Performance Considerations
+
+### DuckDB
+- Optimized for analytical queries and aggregations
+- Best performance with columnar data access patterns
+- In-memory mode provides fastest query execution
+- Batch inserts significantly faster than individual inserts
+- Consider using COPY statements for bulk data loading
+
+### FastDB
+- Ultra-fast key-based lookups (O(1) complexity)
+- MessagePack serialization reduces I/O overhead
+- Best for single-entity CRUD operations
+- Limited support for complex queries across collections
+- Auto-flush may impact write-heavy workload performance
+
 ## Installation
 
 ```bash
@@ -210,6 +298,24 @@ All 24 tests validate:
 - Method implementation instantiation
 - Resource disposal
 - Implementation-specific features (backup, serialization, etc.)
+
+## Roadmap
+
+### Current Status (v1.0)
+- ✅ DuckDB implementation with SQL storage
+- ✅ FastDB implementation with NoSQL collections
+- ✅ 24 passing unit tests
+- ✅ Basic repository lifecycle management
+
+### Planned Features
+- 🔄 Complete CRUD operation implementations for all entities
+- 🔄 LiteDB implementation
+- 🔄 Advanced query support (filtering, pagination, sorting)
+- 🔄 Transaction support across repositories
+- 🔄 Migration tools between storage backends
+- 🔄 Performance benchmarking suite
+- 🔄 Vector similarity search implementation
+- 🔄 Graph traversal algorithms
 
 ## Contributing
 
