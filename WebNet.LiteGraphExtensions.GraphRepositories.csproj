@@ -5,7 +5,27 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <DefaultItemExcludes>$(DefaultItemExcludes);Tests\**</DefaultItemExcludes>
+    
+    <!-- NuGet Package Metadata -->
+    <PackageId>WebNet.LiteGraphExtensions.GraphRepositories</PackageId>
+    <Title>LiteGraph Repository Extensions</Title>
+    <Description>Graph repository implementations for the LiteGraph library. Provides persistent storage backends including DuckDB (SQL/columnar), FastDB (NoSQL/collections), and LiteDB (NoSQL/documents) for graph data structures.</Description>
+    <Authors>WebNet</Authors>
+    <Company>WebNet</Company>
+    <PackageTags>litegraph;graph;database;repository;duckdb;fastdb;litedb;nosql;sql;graph-database</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/jojodev1/WebNet.LiteGraphExtensions.GraphRepositories</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/jojodev1/WebNet.LiteGraphExtensions.GraphRepositories</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="DuckDB.NET.Data.Full" Version="1.4.3" />

@@ -1,5 +1,10 @@
 # WebNet.LiteGraphExtensions.GraphRepositories
 
+[![NuGet Version](https://img.shields.io/nuget/v/WebNet.LiteGraphExtensions.GraphRepositories.svg)](https://www.nuget.org/packages/WebNet.LiteGraphExtensions.GraphRepositories)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/WebNet.LiteGraphExtensions.GraphRepositories.svg)](https://www.nuget.org/packages/WebNet.LiteGraphExtensions.GraphRepositories)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/jojodev1/WebNet.LiteGraphExtensions.GraphRepositories/publish-nuget.yml?branch=main)](https://github.com/jojodev1/WebNet.LiteGraphExtensions.GraphRepositories/actions)
+[![License](https://img.shields.io/github/license/jojodev1/WebNet.LiteGraphExtensions.GraphRepositories.svg)](LICENSE.txt)
+
 Graph repository implementations for the LiteGraph library, providing persistent storage backends for graph data structures.
 
 ## Quick Start
