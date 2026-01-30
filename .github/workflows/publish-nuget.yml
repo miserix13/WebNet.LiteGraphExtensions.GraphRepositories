@@ -63,12 +63,18 @@ jobs:
     
     - name: List artifacts
       run: ls -la ./artifacts
+      
+    - name: NuGet login (OIDC → temp API key)
+      uses: NuGet/login@v1
+      id: login
+      with:
+        user: makutamiserix
     
     - name: Publish to NuGet.org
       run: |
         dotnet nuget push ./artifacts/*.nupkg \
-          --api-key ${{ secrets.NUGET_API_KEY }} \
-          --source ${{ env.NUGET_SOURCE }} \
+          --api-key ${{steps.login.outputs.NUGET_API_KEY}} \
+          --source https://api.nuget.org/v3/index.json \
           --skip-duplicate
     
     - name: Upload artifacts
