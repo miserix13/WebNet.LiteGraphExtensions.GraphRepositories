@@ -1,3 +1,6 @@
 <Solution>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/WebNet.LiteGraphExtensions.GraphRepositories.Tests.csproj" />
+  </Folder>
   <Project Path="WebNet.LiteGraphExtensions.GraphRepositories.csproj" />
 </Solution>
