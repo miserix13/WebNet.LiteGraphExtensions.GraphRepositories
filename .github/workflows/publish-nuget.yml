@@ -19,6 +19,8 @@ env:
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     
     steps:
     - name: Checkout code
