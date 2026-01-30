@@ -1,0 +1,85 @@
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
+using LiteGraph;
+using LiteGraph.GraphRepositories.Interfaces;
+
+namespace WebNet.LiteGraphExtensions.GraphRepositories.Implementations.LiteDB{
+    /// <summary>
+    /// Credential methods for LiteDB.
+    /// </summary>
+    public class CredentialMethods : ICredentialMethods
+    {
+        private readonly LiteDBGraphRepository _repo;
+
+        public CredentialMethods(LiteDBGraphRepository repo)
+        {
+            _repo = repo ?? throw new ArgumentNullException(nameof(repo));
+        }
+
+        public Task<Credential> Create(Credential credential, CancellationToken token = default)
+        {
+            throw new NotImplementedException("CredentialMethods.Create not yet implemented for LiteDB");
+        }
+
+        public async IAsyncEnumerable<Credential> ReadAllInTenant(Guid tenantGuid, EnumerationOrderEnum order = EnumerationOrderEnum.CreatedDescending, int skip = 0, [EnumeratorCancellation] CancellationToken token = default)
+        { yield break; throw new NotImplementedException("CredentialMethods.ReadAllInTenant not yet implemented for LiteDB");
+        }
+
+        public async IAsyncEnumerable<Credential> ReadMany(Guid? tenantGuid, Guid? userGuid, string bearerToken, EnumerationOrderEnum order = EnumerationOrderEnum.CreatedDescending, int skip = 0, [EnumeratorCancellation] CancellationToken token = default)
+        { yield break; throw new NotImplementedException("CredentialMethods.ReadMany not yet implemented for LiteDB");
+        }
+
+        public Task<Credential> ReadByGuid(Guid tenantGuid, Guid guid, CancellationToken token = default)
+        {
+            throw new NotImplementedException("CredentialMethods.ReadByGuid not yet implemented for LiteDB");
+        }
+
+        public async IAsyncEnumerable<Credential> ReadByGuids(Guid tenantGuid, List<Guid> guids, [EnumeratorCancellation] CancellationToken token = default)
+        { yield break; throw new NotImplementedException("CredentialMethods.ReadByGuids not yet implemented for LiteDB");
+        }
+
+        public Task<Credential> ReadByBearerToken(string bearerToken, CancellationToken token = default)
+        {
+            throw new NotImplementedException("CredentialMethods.ReadByBearerToken not yet implemented for LiteDB");
+        }
+
+        public Task<EnumerationResult<Credential>> Enumerate(EnumerationRequest query, CancellationToken token = default)
+        {
+            throw new NotImplementedException("CredentialMethods.Enumerate not yet implemented for LiteDB");
+        }
+
+        public Task<int> GetRecordCount(Guid? tenantGuid, Guid? userGuid, EnumerationOrderEnum order = EnumerationOrderEnum.CreatedDescending, Guid? markerGuid = null, CancellationToken token = default)
+        {
+            throw new NotImplementedException("CredentialMethods.GetRecordCount not yet implemented for LiteDB");
+        }
+
+        public Task<Credential> Update(Credential cred, CancellationToken token = default)
+        {
+            throw new NotImplementedException("CredentialMethods.Update not yet implemented for LiteDB");
+        }
+
+        public Task DeleteAllInTenant(Guid tenantGuid, CancellationToken token = default)
+        {
+            throw new NotImplementedException("CredentialMethods.DeleteAllInTenant not yet implemented for LiteDB");
+        }
+
+        public Task DeleteByGuid(Guid tenantGuid, Guid guid, CancellationToken token = default)
+        {
+            throw new NotImplementedException("CredentialMethods.DeleteByGuid not yet implemented for LiteDB");
+        }
+
+        public Task DeleteByUser(Guid tenantGuid, Guid userGuid, CancellationToken token = default)
+        {
+            throw new NotImplementedException("CredentialMethods.DeleteByUser not yet implemented for LiteDB");
+        }
+
+        public Task<bool> ExistsByGuid(Guid tenantGuid, Guid guid, CancellationToken token = default)
+        {
+            throw new NotImplementedException("CredentialMethods.ExistsByGuid not yet implemented for LiteDB");
+        }
+    }
+}
+

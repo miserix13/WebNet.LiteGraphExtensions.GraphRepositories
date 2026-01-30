@@ -14,7 +14,11 @@ var fastDb = new FastDBGraphRepository("./mydb.fastdb",
     new FastDBOptions { Serializer = SerializerType.MessagePack_Contract });
 fastDb.InitializeRepository();
 
-// Use either repository through the same LiteGraph interfaces
+// Option 3: LiteDB (NoSQL, best for flexibility)
+var liteDb = new LiteDBGraphRepository("mydata.db");
+liteDb.InitializeRepository();
+
+// Use any repository through the same LiteGraph interfaces
 var tenant = await repository.Tenant.Create(new TenantMetadata 
 { 
     GUID = Guid.NewGuid(),
@@ -30,16 +34,19 @@ This library provides concrete implementations of the LiteGraph `GraphRepository
 
 | Feature | DuckDBGraphRepository | FastDBGraphRepository | LiteDBGraphRepository |
 |---------|----------------------|----------------------|----------------------|
-| **Storage Type** | SQL (Columnar) | NoSQL (Key-Value Collections) | NoSQL (Document) |
-| **Best For** | Analytics, Complex Queries | Simple CRUD, High Performance | General Purpose |
+| **Storage Type** | SQL (Columnar) | NoSQL (Key-Value Collections) | NoSQL (Document/BSON) |
+| **Best For** | Analytics, Complex Queries | Simple CRUD, High Performance | General Purpose, Flexible Queries |
 | **ACID Compliance** | ✅ Full | ⚠️ Limited | ✅ Full |
 | **Schema Required** | ✅ Yes | ❌ No | ❌ No |
 | **Backup Support** | ✅ Native | ⚠️ Manual | ⚠️ Pending |
 | **In-Memory Mode** | ✅ Yes | ❌ No | ✅ Yes |
 | **Serialization** | SQL | MessagePack/JSON/Binary | BSON |
 | **File Size** | Large | Small | Medium |
-| **Query Performance** | Excellent (SQL) | Very Fast (Direct Key Access) | Good (Indexed) |
+| **Query Performance** | Excellent (SQL) | Very Fast (Direct Key Access) | Good (LINQ with Indexes) |
 | **Setup Complexity** | Medium | Low | Low |
+| **LINQ Support** | ❌ No | ❌ No | ✅ Full |
+| **Encryption** | ❌ No | ❌ No | ✅ Yes |
+| **Cross-Platform** | ✅ Yes | ✅ Yes | ✅ Yes |
 
 ## When to Use Each Implementation
 
@@ -47,7 +54,7 @@ This library provides concrete implementations of the LiteGraph `GraphRepository
 
 - **FastDBGraphRepository**: Choose when you need lightweight embedded storage with simple key-based access patterns. Best for write-heavy workloads, caching, or when storage size is a concern.
 
-- **LiteDBGraphRepository**: *(Coming soon)* General-purpose document storage with indexing and LINQ query support.
+- **LiteDBGraphRepository**: Choose when you need a balance of features - document flexibility, LINQ queries, ACID transactions, and optional encryption. Best for general-purpose applications requiring flexible schema and good query performance.
 
 ## Available Implementations
 
@@ -219,7 +226,89 @@ Note: Most CRUD operations currently throw `NotImplementedException` and require
 
 ### LiteDBGraphRepository
 
-*(Documentation pending)*
+A versatile document-oriented graph repository implementation using LiteDB, a lightweight NoSQL embedded database for .NET with MongoDB-like features.
+
+#### Features
+
+- **Document Storage**: Schema-less BSON document storage
+- **LINQ Queries**: Full LINQ support for querying collections
+- **Indexes**: Automatic index creation for performance optimization
+- **ACID Transactions**: Full ACID compliance with transaction support
+- **File-Based or In-Memory**: Supports both persistent and memory-only databases
+- **Embedded**: No separate database server required
+- **Cross-Platform**: Works on Windows, Linux, and macOS
+
+#### Usage
+
+```csharp
+using WebNet.LiteGraphExtensions.GraphRepositories;
+
+// Create repository with file-based storage
+var repository = new LiteDBGraphRepository("mydata.db");
+
+// Or use connection string for advanced options
+var repository = new LiteDBGraphRepository("Filename=mydata.db;Connection=shared");
+
+// Initialize and create indexes
+repository.InitializeRepository();
+
+// Use the repository through LiteGraph interfaces
+var tenant = await repository.Tenant.Create(new TenantMetadata 
+{ 
+    GUID = Guid.NewGuid(),
+    Name = "My Tenant" 
+});
+
+var graph = await repository.Graph.Create(new Graph
+{
+    GUID = Guid.NewGuid(),
+    TenantGUID = tenant.GUID,
+    Name = "My Graph"
+});
+
+// Flush changes to disk (checkpoint)
+repository.Flush();
+
+// Dispose when done
+repository.Dispose();
+```
+
+#### Connection Strings
+
+LiteDB supports various connection string options:
+
+- **Simple file**: `"mydata.db"`
+- **With options**: `"Filename=mydata.db;Connection=shared"`
+- **In-memory**: `"Filename=:memory:"`
+- **Temporary**: `"Filename=:temp:"`
+- **Read-only**: `"Filename=mydata.db;ReadOnly=true"`
+- **Encrypted**: `"Filename=mydata.db;Password=mypassword"`
+
+#### Data Storage
+
+The LiteDB implementation stores data in BSON document collections:
+
+- **tenants** - Tenant metadata (indexed by GUID and Name)
+- **graphs** - Graph definitions (indexed by GUID and TenantGUID)
+- **nodes** - Graph nodes with properties (indexed by GUID, GraphGUID, TenantGUID)
+- **edges** - Graph edges connecting nodes (indexed by GUID, GraphGUID, From, To)
+- **labels** - Labels for graphs, nodes, and edges (indexed by GUID)
+- **tags** - Key-value tags for graphs, nodes, and edges (indexed by GUID)
+- **vectors** - Vector embeddings for similarity search (indexed by GUID)
+- **users** - User accounts and authentication (indexed by GUID and Email)
+- **credentials** - API credentials for programmatic access (indexed by GUID)
+
+Indexes are automatically created during initialization for optimal query performance.
+
+#### Implementation Status
+
+The LiteDB repository provides:
+- ✅ **Collection Management**: Automatic collection and index creation
+- ✅ **Connection Management**: Full lifecycle support with proper disposal
+- ✅ **Index Optimization**: Strategic indexes on commonly queried fields
+- ⚠️ **CRUD Operations**: Interface methods defined, implementation in progress
+
+Note: Most CRUD operations currently throw `NotImplementedException` and require implementation based on your specific use case.
 
 ## Architecture
 
@@ -266,6 +355,14 @@ Each implementation provides the same 12 interface implementations, ensuring con
 - Limited support for complex queries across collections
 - Auto-flush may impact write-heavy workload performance
 
+### LiteDB
+- Excellent LINQ query performance with proper indexing
+- BSON serialization balances size and speed
+- Document-oriented design allows flexible schema evolution
+- In-memory mode suitable for testing and caching
+- Index maintenance overhead on write operations
+- Single-file database simplifies deployment and backup
+
 ## Installation
 
 ```bash
@@ -278,6 +375,7 @@ dotnet add package WebNet.LiteGraphExtensions.GraphRepositories
 - LiteGraph 5.0.2
 - DuckDB.NET.Data.Full 1.4.3 (for DuckDB implementation)
 - Stellar.FastDB 1.1.1 (for FastDB implementation)
+- LiteDB 5.0.21 (for LiteDB implementation)
 
 ## Testing
 
@@ -290,32 +388,34 @@ dotnet test
 Test coverage includes:
 - **DuckDB**: 13 tests validating SQL-based storage, schema creation, and backup
 - **FastDB**: 11 tests validating collection-based storage and resource management
+- **LiteDB**: 14 tests validating document storage, indexing, and LINQ support
 
-All 24 tests validate:
+All 38 tests validate:
 - Repository construction and initialization
 - Connection/path validation
 - Schema/collection creation
 - Method implementation instantiation
 - Resource disposal
-- Implementation-specific features (backup, serialization, etc.)
+- Implementation-specific features (backup, serialization, indexing, etc.)
 
 ## Roadmap
 
 ### Current Status (v1.0)
 - ✅ DuckDB implementation with SQL storage
 - ✅ FastDB implementation with NoSQL collections
-- ✅ 24 passing unit tests
+- ✅ LiteDB implementation with document storage
+- ✅ 38 passing unit tests
 - ✅ Basic repository lifecycle management
 
 ### Planned Features
 - 🔄 Complete CRUD operation implementations for all entities
-- 🔄 LiteDB implementation
 - 🔄 Advanced query support (filtering, pagination, sorting)
 - 🔄 Transaction support across repositories
 - 🔄 Migration tools between storage backends
 - 🔄 Performance benchmarking suite
 - 🔄 Vector similarity search implementation
 - 🔄 Graph traversal algorithms
+- 🔄 Full backup/restore implementations
 
 ## Contributing
 
